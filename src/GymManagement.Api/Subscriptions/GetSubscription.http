@@ -1,16 +1,8 @@
-@HostAddress = http://localhost:5132
-@AdminId ="8b986915-ac4d-4b7a-baa9-d19302f4210b"
-@SubscriptionId= 0df86f51-35e7-4387-a8d1-64da74a93009
+@host=http://localhost:5132
+@SubscriptionId= c76a577c-bf7a-430c-9a05-ae62b8ac21d3
 ###
 
-GET {{HostAddress}}/Subscriptions/{{SubscriptionId}}
+GET {{host}}/Subscriptions/{{SubscriptionId}}
 Content-Type: application/json
-
-###
-# Response
-#{
-#  "Id": {{SubscriptionId}},
-#  "SubscritpionType" : "Free" 
-#}
 
 ###

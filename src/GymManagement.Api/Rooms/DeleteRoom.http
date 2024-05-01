@@ -1,0 +1,5 @@
+@host=http://localhost:5132
+@gymId = bec58b59-d05d-4a85-a122-761876aa73f9
+@roomId = f668d9ce-5266-420e-8c41-e71a89f41325
+DELETE {{host}}/gyms/{{gymId}}/rooms/{{roomId}}
+Authorization: Bearer {{token}}

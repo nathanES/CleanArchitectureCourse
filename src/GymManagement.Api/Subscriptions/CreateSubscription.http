@@ -1,9 +1,9 @@
-@HostAddress = http://localhost:5132
+@host = http://localhost:5132
 @AdminId =8b986915-ac4d-4b7a-baa9-d19302f4210b
 //SubscriptionType : Free, Starter, Pro
 ###
 
-POST {{HostAddress}}/Subscriptions/
+POST {{host}}/Subscriptions/
 Content-Type: application/json
 
 {
