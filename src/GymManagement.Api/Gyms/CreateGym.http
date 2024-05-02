@@ -1,5 +1,5 @@
 @host=http://localhost:5132
-@subscriptionId=c76a577c-bf7a-430c-9a05-ae62b8ac21d3
+@subscriptionId=9ed950cf-b538-4fa8-b1d9-a32e9b9620cf
 
 POST {{host}}/subscriptions/{{subscriptionId}}/gyms
 Content-Type: application/json
