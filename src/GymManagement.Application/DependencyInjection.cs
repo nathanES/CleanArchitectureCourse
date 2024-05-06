@@ -1,4 +1,10 @@
+using GymManagement.Application.Gyms.Commands.CreateGym;
+using GymManagement.Domain.Gyms;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using ErrorOr;
+using FluentValidation;
+using GymManagement.Application.Common.Behaviors;
 
 
 namespace GymManagement.Application;
@@ -10,7 +16,12 @@ public static class DependencyInjection
         services.AddMediatR(options =>
         {
             options.RegisterServicesFromAssemblyContaining(typeof(DependencyInjection));
+            options.AddOpenBehavior(typeof(ValidationBehavior<,>));
+
         });
+        services.AddValidatorsFromAssemblyContaining(typeof(DependencyInjection));
+
+        
         return services;
     }
 }

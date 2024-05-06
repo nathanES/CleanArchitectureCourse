@@ -22,4 +22,8 @@
     <ProjectReference Include="..\GymManagement.Infrastructure\GymManagement.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="HttpRequestFiles\" />
+  </ItemGroup>
+
 </Project>
