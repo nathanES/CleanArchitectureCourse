@@ -35,21 +35,14 @@ public class SubscriptionsController : ControllerBase
 
         var createSubscriptionResult = await _mediator.Send(command);
 
-
-        return createSubscriptionResult.MatchFirst(
-            subscription =>  Ok(new SubscriptionResponse(subscription.Id, request.SubscriptionType)),
-            error => Problem());
-        
-        // if (createSubscriptionResult.IsError)
-        // {
-        //     return Problem();
-        // }
-        //
-        // var response = new SubscriptionResponse(
-        //     createSubscriptionResult.Value,
-        //     request.SubscriptionType);
-        //
-        // return Ok(response);
+        return createSubscriptionResult.Match(
+            subscription => CreatedAtAction(
+                nameof(GetSubscription),
+                new { subscriptionId = subscription.Id },
+                new SubscriptionResponse(
+                    subscription.Id,
+                    ToDto(subscription.SubscriptionType))),
+        error =>Problem());
     }
     
     [HttpGet("{subscriptionId:guid}")]
