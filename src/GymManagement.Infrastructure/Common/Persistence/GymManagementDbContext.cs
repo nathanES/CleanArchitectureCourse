@@ -7,33 +7,31 @@ using GymManagement.Domain.Subscriptions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using GymManagement.Domain.Users;
+
 
 namespace GymManagement.Infrastructure.Common.Persistence;
 
-public class GymManagementDbContext : DbContext, IUnitOfWork
+public class GymManagementDbContext(
+    DbContextOptions options,
+    IHttpContextAccessor httpContextAccessor,
+    IPublisher _publisher) : DbContext(options), IUnitOfWork
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IPublisher _publisher;
-
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public DbSet<Admin> Admins { get; set; } = null!;
     public DbSet<Subscription> Subscriptions { get; set; } = null!;
     public DbSet<Gym> Gyms { get; set; } = null!;
-    
-    public GymManagementDbContext(DbContextOptions options, IHttpContextAccessor httpContextAccessor, IPublisher publisher) : base(options)
-    {
-        _httpContextAccessor = httpContextAccessor;
-        _publisher = publisher;
-    }
+    public DbSet<User> Users { get; set; } = null!;
 
     public async Task CommitChangesAsync()
     {
-        // get hold all the domain events
+        // get hold of all the domain events
         var domainEvents = ChangeTracker.Entries<Entity>()
             .Select(entry => entry.Entity.PopDomainEvents())
             .SelectMany(x => x)
             .ToList();
-        
+
         // store them in the http context for later if user is waiting online
         if (IsUserWaitingOnline())
         {
@@ -43,16 +41,18 @@ public class GymManagementDbContext : DbContext, IUnitOfWork
         {
             await PublishDomainEvents(_publisher, domainEvents);
         }
-        
-        await base.SaveChangesAsync();
+
+        await SaveChangesAsync();
     }
-    private async Task PublishDomainEvents(IPublisher publisher, List<IDomainEvent> domainEvents)
+
+    private static async Task PublishDomainEvents(IPublisher _publisher, List<IDomainEvent> domainEvents)
     {
         foreach (var domainEvent in domainEvents)
         {
-            await publisher.Publish(domainEvent);
+            await _publisher.Publish(domainEvent);
         }
     }
+
     private bool IsUserWaitingOnline() => _httpContextAccessor.HttpContext is not null;
 
     private void AddDomainEventsToOfflineProcessingQueue(List<IDomainEvent> domainEvents)
@@ -60,8 +60,8 @@ public class GymManagementDbContext : DbContext, IUnitOfWork
         // fetch queue from http context or create a new queue if it doesn't exist
         var domainEventsQueue = _httpContextAccessor.HttpContext!.Items
             .TryGetValue("DomainEventsQueue", out var value) && value is Queue<IDomainEvent> existingDomainEvents
-            ? existingDomainEvents
-            : new Queue<IDomainEvent>();
+                ? existingDomainEvents
+                : new Queue<IDomainEvent>();
 
         // add the domain events to the end of the queue
         domainEvents.ForEach(domainEventsQueue.Enqueue);
